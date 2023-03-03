@@ -7,6 +7,8 @@
         static void Main(string[] args)
         {
             FootballBettingContext context = new FootballBettingContext();
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
         }
     }
 }
