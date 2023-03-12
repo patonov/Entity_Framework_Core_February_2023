@@ -3,6 +3,7 @@
     using BookShop.Models.Enums;
     using Data;
     using Initializer;
+    using Microsoft.EntityFrameworkCore.Metadata.Conventions;
     using System.Globalization;
     using System.Text;
     using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -27,8 +28,15 @@
             //Console.WriteLine(GetBooksByAuthor(db, "R"));
             //Console.WriteLine(CountBooks(db, 12));
             //Console.WriteLine(CountCopiesByAuthor(db));
-            Console.WriteLine(GetTotalProfitByCategory(db));
-        
+            //Console.WriteLine(GetTotalProfitByCategory(db));
+
+            //Console.WriteLine(GetMostRecentBooks(db));
+
+            //IncreasePrices(db);
+
+            RemoveBooks(db);
+
+
         }
 
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -213,6 +221,59 @@
             }
 
             return sb.ToString().TrimEnd();
+        }
+
+        public static string GetMostRecentBooks(BookShopContext context)
+        {
+            var categories = context.Categories
+                .OrderBy(c => c.Name)
+                .Select(c => new
+                {
+                    CategoryName = c.Name,
+                    CategoryRecentThreeBooks = c.CategoryBooks.OrderByDescending(cb => cb.Book.ReleaseDate).Take(3).Select(cb => new
+                    {
+                        BookTitle = cb.Book.Title,
+                        BookReleaseDate = cb.Book.ReleaseDate!.Value.Year
+                    }).ToArray()
+                }).ToArray();
+
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var category in categories) 
+            {
+                sb.AppendLine($"--{category.CategoryName}");
+
+                foreach (var book in category.CategoryRecentThreeBooks)
+                {
+                    sb.AppendLine($"{book.BookTitle} ({book.BookReleaseDate})");
+                }
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        public static void IncreasePrices(BookShopContext context)
+        {
+            var booksBefore2010 = context.Books.Where(b => b.ReleaseDate.HasValue && b.ReleaseDate.Value.Year < 2010).ToArray();
+
+            foreach (var book in booksBefore2010)
+            {
+                book.Price += 5;
+            }
+            
+            context.SaveChanges();
+        }
+
+        public static int RemoveBooks(BookShopContext context)
+        {
+            var books = context.Books.Where(b => b.Copies < 4200).ToArray();
+
+            context.RemoveRange(books);
+                        
+            context.SaveChanges();
+            
+            return books.Count();
         }
 
     }
