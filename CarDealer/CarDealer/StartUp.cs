@@ -1,10 +1,15 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using CarDealer.Data;
+using CarDealer.DTOs.Export;
 using CarDealer.DTOs.Import;
 using CarDealer.Models;
 using Castle.Core.Resource;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Globalization;
 using System.IO;
+using System.Xml.Linq;
 
 namespace CarDealer
 {
@@ -24,7 +29,13 @@ namespace CarDealer
             //Console.WriteLine(ImportParts(context, inputPartString));
             //Console.WriteLine(ImportCars(context, inputCarString));
             //Console.WriteLine(ImportCustomers(context, inputCustomerString));
-            Console.WriteLine(ImportSales(context, inputSaleString));
+            //Console.WriteLine(ImportSales(context, inputSaleString));
+
+            //Console.WriteLine(GetOrderedCustomers(context));
+            //Console.WriteLine(GetCarsFromMakeToyota(context));
+            //Console.WriteLine(GetLocalSuppliers(context));
+            //Console.WriteLine(GetCarsWithTheirListOfParts(context));
+            Console.WriteLine(GetTotalSalesByCustomer(context));
         
         }
 
@@ -157,8 +168,103 @@ namespace CarDealer
             context.SaveChanges();
 
             return $"Successfully imported {validSales.Count}.";
-
         }
+
+        public static string GetOrderedCustomers(CarDealerContext context)
+        { 
+        var customers = context.Customers.OrderBy(c => c.BirthDate).ThenBy(c => c.IsYoungDriver)
+                .Select(c => new 
+                {
+                    Name = c.Name,
+                    BirthDate = c.BirthDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
+                    IsYoungDriver = c.IsYoungDriver
+                }).AsNoTracking().ToList();
+
+            return JsonConvert.SerializeObject(customers, Formatting.Indented);
+        }
+
+        public static string GetCarsFromMakeToyota(CarDealerContext context)
+        {
+            //IMapper mapper = new Mapper(new MapperConfiguration(cfg =>
+            // {
+            //    cfg.AddProfile<CarDealerProfile>();
+            // }));
+
+            //  var carsToExpooo = context.Cars.Where(c => c.Make == "Toyota").OrderBy(c => c.Model).ThenByDescending(c => c.TravelledDistance)
+            //    .ProjectTo<ExportToyotaMakeDto>(mapper.ConfigurationProvider);
+
+            // var cars = mapper.Map<IEnumerable<ExportToyotaMakeDto>>(carsToExpooo);
+
+            // return JsonConvert.SerializeObject(cars, Formatting.Indented);
+
+            var carsToExpooo = context.Cars
+                .Where(c => c.Make == "Toyota")
+                .Select(c => new
+                {
+                    c.Id,
+                    c.Make,
+                    c.Model,
+                    TraveledDistance = c.TravelledDistance,
+                 }).AsNoTracking().ToArray()
+                .OrderBy(c => c.Model)
+                .ThenByDescending(c => c.TraveledDistance);
+                        
+            return JsonConvert.SerializeObject(carsToExpooo, Formatting.Indented);
+        }
+
+
+        public static string GetLocalSuppliers(CarDealerContext context)
+        {
+            var suppliers = context.Suppliers.Where(s => s.IsImporter == false).Select(s => new
+            {
+                Id = s.Id,
+                Name = s.Name,
+                PartsCount = s.Parts.Count()
+            }).AsNoTracking().ToList();
+
+            return JsonConvert.SerializeObject(suppliers, Formatting.Indented);
+        }
+
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+
+            var cars = context.Cars.Select(c => new
+            {
+                car = new { Make = c.Make, Model = c.Model, TraveledDistance = c.TravelledDistance },
+                parts = c.PartsCars.Select(p => new { Name = p.Part.Name, Price = p.Part.Price })
+            }).ToList();
+
+            return JsonConvert.SerializeObject(cars, Formatting.Indented);
+        
+        }
+
+        public static string GetTotalSalesByCustomer(CarDealerContext context)
+        {
+            var customers = context.Customers.Where(c => c.Sales.Count() > 0).Select(c => new
+                {
+                    fullName = c.Name,
+                    boughtCars = c.Sales.Count,
+                    cars = c.Sales
+                        .Select(s => new
+                        {
+                            carModelName = s.Car.Model,
+                            spending = s.Car.PartsCars.Sum(pc => pc.Part.Price)
+                        }).ToArray(),
+                }).ToArray(); 
+
+
+            var customersToExport = customers.Select(c => new
+                {
+                    fullName = c.fullName,
+                    boughtCars = c.boughtCars,
+                    spentMoney = c.cars.Sum(c => c.spending)
+                })
+                .OrderByDescending(x => x.spentMoney)
+                .ThenByDescending(x => x.boughtCars).ToArray();
+
+            return JsonConvert.SerializeObject(customersToExport, Formatting.Indented);
+        }
+
 
     }
 }
