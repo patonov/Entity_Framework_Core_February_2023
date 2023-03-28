@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CarDealer.DTOs.Export;
 using CarDealer.DTOs.Import;
 using CarDealer.Models;
 
@@ -19,6 +20,10 @@ namespace CarDealer
             this.CreateMap<ImportCustomerDto, Customer>();
 
             this.CreateMap<ImportSaleDto, Sale>();
+
+            this.CreateMap<Car, ExportCarDto>();
+
+            this.CreateMap<Car, ExportCarBmwDto>();
         }
     }
 }

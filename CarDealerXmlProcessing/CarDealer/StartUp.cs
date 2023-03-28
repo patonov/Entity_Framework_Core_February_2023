@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using CarDealer.Data;
+using CarDealer.DTOs.Export;
 using CarDealer.DTOs.Import;
 using CarDealer.Models;
 using Castle.Core.Resource;
 using System.Reflection.Metadata.Ecma335;
+using System.Text;
 using System.Xml.Serialization;
 
 namespace CarDealer
@@ -24,8 +27,10 @@ namespace CarDealer
             //Console.WriteLine(ImportParts(context, importPartString));
             //Console.WriteLine(ImportCars(context, importCarString));
             //Console.WriteLine(ImportCustomers(context, importCustomerString));
-            Console.WriteLine(ImportSales(context, importSaleString));
-        
+            //Console.WriteLine(ImportSales(context, importSaleString));
+
+            //Console.WriteLine(GetCarsWithDistance(context));
+            Console.WriteLine(GetCarsFromMakeBmw(context));
         }
 
         public static string ImportSuppliers(CarDealerContext context, string inputXml)
@@ -209,6 +214,65 @@ namespace CarDealer
 
             return $"Successfully imported {salesValided.Count}";
         }
+
+        public static string GetCarsWithDistance(CarDealerContext context)
+        {
+            IMapper mapper = new Mapper(new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<CarDealerProfile>();
+            }));
+
+            StringBuilder sb = new StringBuilder();
+
+            ExportCarDto[] exportCarDtos = context.Cars.Where(c => c.TraveledDistance > 2000000)
+                .OrderBy(c => c.Make)
+                .ThenBy(c => c.Model)
+                .Take(10)
+                .ProjectTo<ExportCarDto>(mapper.ConfigurationProvider)
+                .ToArray();
+
+            XmlRootAttribute root = new XmlRootAttribute("cars");
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(ExportCarDto[]), root);
+
+            XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+            namespaces.Add(string.Empty, string.Empty);
+
+            using StringWriter writer = new StringWriter(sb);
+
+            xmlSerializer.Serialize(writer, exportCarDtos, namespaces);
+                
+            return sb.ToString().TrimEnd();
+        }
+
+        public static string GetCarsFromMakeBmw(CarDealerContext context)
+        {
+            IMapper mapper = new Mapper(new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<CarDealerProfile>();
+            }));
+
+            StringBuilder sb = new StringBuilder();
+
+            ExportCarBmwDto[] exportBMWCarDtos = context.Cars.Where(c => c.Make.ToUpper() == "BMW")
+                .OrderBy(c => c.Model)
+                .ThenByDescending(c => c.TraveledDistance)
+                .ProjectTo<ExportCarBmwDto>(mapper.ConfigurationProvider).ToArray();
+
+            XmlRootAttribute root = new XmlRootAttribute("cars");
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(ExportCarBmwDto[]), root);
+
+            XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+            namespaces.Add(string.Empty, string.Empty);
+
+            using StringWriter writer = new StringWriter(sb);
+
+            xmlSerializer.Serialize(writer, exportBMWCarDtos, namespaces);
+
+            return sb.ToString().TrimEnd();
+        }
+
+
+
 
     }
 }
