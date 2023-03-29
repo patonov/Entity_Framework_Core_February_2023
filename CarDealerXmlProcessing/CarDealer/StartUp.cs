@@ -30,7 +30,10 @@ namespace CarDealer
             //Console.WriteLine(ImportSales(context, importSaleString));
 
             //Console.WriteLine(GetCarsWithDistance(context));
-            Console.WriteLine(GetCarsFromMakeBmw(context));
+            //Console.WriteLine(GetCarsFromMakeBmw(context));
+            //Console.WriteLine(GetLocalSuppliers(context));
+            Console.WriteLine(GetCarsWithTheirListOfParts(context));
+        
         }
 
         public static string ImportSuppliers(CarDealerContext context, string inputXml)
@@ -271,6 +274,59 @@ namespace CarDealer
             return sb.ToString().TrimEnd();
         }
 
+        public static string GetLocalSuppliers(CarDealerContext context)
+        {
+            IMapper mapper = new Mapper(new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<CarDealerProfile>();
+            }));
+
+            StringBuilder sb = new StringBuilder();
+
+            ExportLocalSupplierDto[] localDto = context.Suppliers.Where(s => s.IsImporter == false)
+                .Select(s => new ExportLocalSupplierDto { Id = s.Id, Name = s.Name, Count = s.Parts.Count }).ToArray();
+
+            XmlRootAttribute root = new XmlRootAttribute("suppliers");
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(ExportLocalSupplierDto[]), root);
+
+            XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+            namespaces.Add(string.Empty, string.Empty);
+
+            using StringWriter writer = new StringWriter(sb);
+
+            xmlSerializer.Serialize(writer, localDto, namespaces);
+
+            return sb.ToString().TrimEnd();
+
+        }
+
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+            IMapper mapper = new Mapper(new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<CarDealerProfile>();
+            }));
+            
+            StringBuilder sb = new StringBuilder();
+
+            ExportCarWithPartsDto[] exportCarWithPartsDtos = context.Cars.OrderByDescending(c => c.TraveledDistance)
+                .ThenBy(c => c.Model)
+                .Take(5)
+                .ProjectTo<ExportCarWithPartsDto>(mapper.ConfigurationProvider)
+                .ToArray();
+
+            XmlRootAttribute root = new XmlRootAttribute("cars");
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(ExportCarWithPartsDto[]), root);
+
+            XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+            namespaces.Add(string.Empty, string.Empty);
+
+            using StringWriter writer = new StringWriter(sb);
+
+            xmlSerializer.Serialize(writer, exportCarWithPartsDtos, namespaces);
+
+            return sb.ToString().TrimEnd();
+        }
 
 
 

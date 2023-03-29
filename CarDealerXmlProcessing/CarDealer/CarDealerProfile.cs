@@ -21,9 +21,16 @@ namespace CarDealer
 
             this.CreateMap<ImportSaleDto, Sale>();
 
+            this.CreateMap<Part, ExportCarPartsDto>();
+
             this.CreateMap<Car, ExportCarDto>();
 
             this.CreateMap<Car, ExportCarBmwDto>();
+            
+            this.CreateMap<Car, ExportCarWithPartsDto>()
+                .ForMember(d => d.Parts, opt => opt.MapFrom(s => s.PartsCars.Select(pc => pc.Part)
+                .OrderByDescending(p => p.Price).ToArray()));
+
         }
     }
 }
