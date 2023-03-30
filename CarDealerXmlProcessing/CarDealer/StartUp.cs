@@ -32,8 +32,8 @@ namespace CarDealer
             //Console.WriteLine(GetCarsWithDistance(context));
             //Console.WriteLine(GetCarsFromMakeBmw(context));
             //Console.WriteLine(GetLocalSuppliers(context));
-            Console.WriteLine(GetCarsWithTheirListOfParts(context));
-        
+            //Console.WriteLine(GetCarsWithTheirListOfParts(context));
+            Console.WriteLine(GetTotalSalesByCustomer(context));
         }
 
         public static string ImportSuppliers(CarDealerContext context, string inputXml)
@@ -61,7 +61,7 @@ namespace CarDealer
                 }
 
                 Supplier supplier = mapper.Map<Supplier>(dto);
-                
+
                 suppliers.Add(supplier);
             }
 
@@ -85,7 +85,7 @@ namespace CarDealer
             StringReader reader = new StringReader(inputXml);
 
             ImportPartDto[] partDtos = (ImportPartDto[])serializer.Deserialize(reader);
-           
+
             ICollection<Part> parts = new HashSet<Part>();
 
             foreach (ImportPartDto dto in partDtos)
@@ -124,12 +124,12 @@ namespace CarDealer
 
             foreach (ImportCarDto carDto in importCarDtos)
             {
-                if(string.IsNullOrEmpty(carDto.Make) || string.IsNullOrEmpty(carDto.Model))
+                if (string.IsNullOrEmpty(carDto.Make) || string.IsNullOrEmpty(carDto.Model))
                 {
                     continue;
                 }
                 Car car = mapper.Map<Car>(carDto);
-                                
+
                 foreach (ImportCarPartDto importPartCarDto in carDto.Parts.DistinctBy(p => p.PartId))
                 {
                     if (!context.Parts.Any(p => p.Id == importPartCarDto.PartId))
@@ -172,8 +172,8 @@ namespace CarDealer
             ICollection<Customer> customerrsValided = new HashSet<Customer>();
 
             foreach (ImportCustomerDto customerDto in importCustomerDtos)
-            { 
-            Customer customer = mapper.Map<Customer>(customerDto);
+            {
+                Customer customer = mapper.Map<Customer>(customerDto);
                 customerrsValided.Add(customer);
             }
 
@@ -201,7 +201,7 @@ namespace CarDealer
             ICollection<Sale> salesValided = new HashSet<Sale>();
 
             foreach (ImportSaleDto saleDto in importSaleDtos)
-            {             
+            {
                 if (!context.Cars.Any(c => c.Id == saleDto.CarId))
                 {
                     continue;
@@ -243,7 +243,7 @@ namespace CarDealer
             using StringWriter writer = new StringWriter(sb);
 
             xmlSerializer.Serialize(writer, exportCarDtos, namespaces);
-                
+
             return sb.ToString().TrimEnd();
         }
 
@@ -306,7 +306,7 @@ namespace CarDealer
             {
                 cfg.AddProfile<CarDealerProfile>();
             }));
-            
+
             StringBuilder sb = new StringBuilder();
 
             ExportCarWithPartsDto[] exportCarWithPartsDtos = context.Cars.OrderByDescending(c => c.TraveledDistance)
@@ -328,7 +328,36 @@ namespace CarDealer
             return sb.ToString().TrimEnd();
         }
 
+        public static string GetTotalSalesByCustomer(CarDealerContext context)
+        {
+            IMapper mapper = new Mapper(new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<CarDealerProfile>();
+            }));
 
+            StringBuilder sb = new StringBuilder();
 
+            ExportCarPriceDto[] carPriceDtos = context.Customers
+                .Where(c => c.Sales.Count > 0)
+                .ProjectTo<ExportCarPriceDto>(mapper.ConfigurationProvider)
+                .ToArray();
+
+            CustomersWithSalesDto[] customersWithSalesDtos =
+                mapper.Map<CustomersWithSalesDto[]>(carPriceDtos)
+                .OrderByDescending(c => c.MoneySpent)
+                .ToArray();
+
+            XmlRootAttribute root = new XmlRootAttribute("customers");
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(CustomersWithSalesDto[]), root);
+
+            XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+            namespaces.Add(string.Empty, string.Empty);
+
+            using StringWriter writer = new StringWriter(sb);
+
+            xmlSerializer.Serialize(writer, customersWithSalesDtos, namespaces);
+
+            return sb.ToString().TrimEnd();
+        }
     }
 }
