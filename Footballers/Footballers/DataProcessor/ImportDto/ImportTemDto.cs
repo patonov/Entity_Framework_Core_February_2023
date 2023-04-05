@@ -1,20 +1,15 @@
-﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
+﻿using Footballers.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
-namespace Footballers.Data.Models
+namespace Footballers.DataProcessor.ImportDto
 {
-    public class Team
+    public class ImportTemDto
     {
-        [Key]
-        public int Id { get; set; }
-
         [Required]
         [MaxLength(40)]
         [MinLength(3)]
@@ -29,7 +24,7 @@ namespace Footballers.Data.Models
         [Required]
         public int Trophies { get; set; }
 
-        public virtual ICollection<TeamFootballer> TeamsFootballers { get; set; } = new HashSet<TeamFootballer>();
+        public int[] Footballers { get; set; }
 
 
     }
