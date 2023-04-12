@@ -13,7 +13,6 @@ namespace Trucks.Data.Models
         [Key]
         public int Id { get; set; }
 
-
         [Required]
         [MinLength(2)]
         [MaxLength(40)]
