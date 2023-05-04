@@ -4,15 +4,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
+using TeisterMask.Data.Models;
 
-namespace TeisterMask.Data.Models
+namespace TeisterMask.DataProcessor.ImportDto
 {
-    public class Employee
+    public class ImportEmployeeDto
     {
-        [Key]
-        public int Id { get; set; }
-
         [Required]
         [MaxLength(40)]
         [MinLength(3)]
@@ -26,13 +23,8 @@ namespace TeisterMask.Data.Models
 
         [Required]
         [RegularExpression(@"[0-9]{3}\-[0-9]{3}\-[0-9]{4}")]
-        public string Phone { get; set; } = null!; 
+        public string Phone { get; set; } = null!;
 
-        public ICollection<EmployeeTask> EmployeesTasks { get; set; } = new List<EmployeeTask>();
-
-
-
-
-
+        public int[] Tasks { get; set; }
     }
 }

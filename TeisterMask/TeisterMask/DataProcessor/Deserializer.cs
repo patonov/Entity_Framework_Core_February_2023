@@ -12,6 +12,8 @@ namespace TeisterMask.DataProcessor
     using TeisterMask.Data.Models;
     using System.Globalization;
     using TeisterMask.Data.Models.Enums;
+    using Newtonsoft.Json;
+    using System.Diagnostics;
 
     public class Deserializer
     {
@@ -145,7 +147,46 @@ namespace TeisterMask.DataProcessor
 
         public static string ImportEmployees(TeisterMaskContext context, string jsonString)
         {
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder();
+
+            ImportEmployeeDto[] employeeDtos = JsonConvert.DeserializeObject<ImportEmployeeDto[]>(jsonString);
+            ICollection<Employee> validEmps = new HashSet<Employee>();
+
+            foreach (ImportEmployeeDto employeeDto in employeeDtos)
+            {
+                if (!IsValid(employeeDto))
+                {
+                    sb.AppendLine(ErrorMessage);
+                    continue;
+                }
+
+                Employee employee = new Employee()
+                {
+                    Username = employeeDto.Username,
+                    Email = employeeDto.Email,
+                    Phone = employeeDto.Phone
+                };
+
+                foreach (var taskId in employeeDto.Tasks.Distinct())
+                {
+                    Task task = context.Tasks.FirstOrDefault(t => t.Id == taskId);
+
+                    if (task == null)
+                    {
+                        sb.AppendLine(ErrorMessage);
+                        continue;
+                    }
+
+                    employee.EmployeesTasks.Add(new EmployeeTask() { Task = task });
+                }
+                validEmps.Add(employee);
+                sb.AppendLine(string.Format(SuccessfullyImportedEmployee, employee.Username, employee.EmployeesTasks.Count));
+            }
+
+            context.Employees.AddRange(validEmps);
+            context.SaveChanges();
+
+            return sb.ToString().TrimEnd();
         }
 
         private static bool IsValid(object dto)
