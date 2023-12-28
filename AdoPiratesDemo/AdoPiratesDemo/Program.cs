@@ -51,6 +51,11 @@ namespace AdoPiratesDemo
                 }
             }
             Console.WriteLine("adoadoadoadoadoadoadoadoadoadoadoadoadoadoadoadoado");
+
+            SqlCommand insertCmd = new SqlCommand(CommandStrings.InsertPirateAndPlunder, connection);
+            int output = insertCmd.ExecuteNonQuery();
+            Console.WriteLine(output);
         }   
+
     }
 }
