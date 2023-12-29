@@ -52,9 +52,29 @@ namespace AdoPiratesDemo
             }
             Console.WriteLine("adoadoadoadoadoadoadoadoadoadoadoadoadoadoadoadoado");
 
-            SqlCommand insertCmd = new SqlCommand(CommandStrings.InsertPirateAndPlunder, connection);
-            int output = insertCmd.ExecuteNonQuery();
-            Console.WriteLine(output);
+            //SqlCommand insertCmd = new SqlCommand(CommandStrings.InsertPirateAndPlunder, connection);
+            //int output = insertCmd.ExecuteNonQuery();
+            //Console.WriteLine(output);
+
+            SqlCommand sqlCommandSearchingParticipantsInPlunder = new SqlCommand(CommandStrings.SearchParticipantsInPlunderFor("Madagascar"), connection);
+
+            try
+            {
+                SqlDataReader whatIsDone = sqlCommandSearchingParticipantsInPlunder.ExecuteReader();
+                using (whatIsDone)
+                {
+                    Console.WriteLine("Pirate's Names");
+                    while (whatIsDone.Read())
+                    {
+                        string names = (string)whatIsDone["Pirate's Names"];
+                        Console.WriteLine(names);
+                    }
+                }                
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
         }   
 
     }

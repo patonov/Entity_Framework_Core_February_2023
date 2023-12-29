@@ -11,5 +11,11 @@ namespace AdoPiratesDemo
         public const string SelectShipNames = "SELECT Name FROM Ships";
 
         public const string InsertPirateAndPlunder = "INSERT INTO PiratesPlunders(PirateId, PlunderId) VALUES(50, 6)";
+
+        public static string SearchParticipantsInPlunderFor(string location) 
+        {
+            return $"exec usp_SearchParticipantsInPlunder '{location}'";
+        }
+
     }
 }
