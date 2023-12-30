@@ -17,5 +17,10 @@ namespace AdoPiratesDemo
             return $"exec usp_SearchParticipantsInPlunder '{location}'";
         }
 
+        public static string ReportAboutFreeBerthsOnBoardOfShip(int i)
+        {
+            return $"SELECT dbo.udf_FreeBerthsOnShip({i})";
+        }
+
     }
 }

@@ -75,6 +75,22 @@ namespace AdoPiratesDemo
             {
                 throw new Exception(ex.Message);
             }
+
+            Console.WriteLine("tralalalaltralalalaltralalallaltralalal");
+
+            SqlCommand berthsCommand = new SqlCommand(CommandStrings.ReportAboutFreeBerthsOnBoardOfShip(60), connection);
+
+            object berths = berthsCommand.ExecuteScalar();
+            
+            if (berths != null)
+            {
+                Console.WriteLine($"Free Berths on the board of the Ship you are interested: {berths}");
+            }
+            else
+            {
+                Console.WriteLine("You have a mistake.");
+            }
+
         }   
 
     }
