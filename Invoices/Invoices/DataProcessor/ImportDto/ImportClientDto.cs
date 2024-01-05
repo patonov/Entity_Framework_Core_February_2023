@@ -12,7 +12,7 @@ namespace Invoices.DataProcessor.ImportDto
     public class ImportClientDto
     {
         [Required]
-        [MaxLength(15)]
+        [MaxLength(25)]
         [MinLength(10)]
         [XmlElement("Name")]
         public string Name { get; set; } = null!;

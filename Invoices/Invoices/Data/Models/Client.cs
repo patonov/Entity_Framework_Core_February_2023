@@ -13,7 +13,7 @@ namespace Invoices.Data.Models
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(15)]
+        [MaxLength(25)]
         public string Name { get; set; } = null!;
 
         [Required]
