@@ -8,6 +8,8 @@
     using DataProcessor.ImportDto;
     using System.Diagnostics.Metrics;
     using Invoices.Data.Models;
+    using Newtonsoft.Json;
+    using System.Globalization;
 
     public class Deserializer
     {
@@ -81,7 +83,49 @@
 
         public static string ImportInvoices(InvoicesContext context, string jsonString)
         {
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder();
+
+            ImportInvoiceDto[] invoiceDtos = JsonConvert.DeserializeObject<ImportInvoiceDto[]>(jsonString);
+            ICollection<Invoice> validInvoices = new HashSet<Invoice>();
+
+            foreach (ImportInvoiceDto invoiceDto in invoiceDtos)
+            {
+                if (!IsValid(invoiceDto))
+                {
+                    sb.AppendLine(ErrorMessage);
+                    continue;
+                }
+
+                if (invoiceDto.DueDate == DateTime.ParseExact("01/01/0001", "dd/MM/yyyy", CultureInfo.InvariantCulture) || 
+                    invoiceDto.IssueDate == DateTime.ParseExact("01/01/0001", "dd/MM/yyyy", CultureInfo.InvariantCulture))
+                {
+                    sb.AppendLine(ErrorMessage);
+                    continue;
+                }
+
+                Invoice invoice = new Invoice()
+                {
+                    Number = invoiceDto.Number,
+                    IssueDate = invoiceDto.IssueDate,
+                    DueDate = invoiceDto.DueDate,
+                    Amount = invoiceDto.Amount,
+                    CurrencyType = invoiceDto.CurrencyType,
+                    ClientId = invoiceDto.ClientId
+                };
+
+                if (invoice.IssueDate > invoice.DueDate)
+                {
+                    sb.AppendLine(ErrorMessage);
+                    continue;
+                }
+
+                validInvoices.Add(invoice);
+                sb.AppendLine(string.Format(SuccessfullyImportedInvoices, invoice.Number));
+            }
+
+            context.Invoices.AddRange(validInvoices);
+            context.SaveChanges();
+            return sb.ToString();
         }
 
         public static string ImportProducts(InvoicesContext context, string jsonString)
