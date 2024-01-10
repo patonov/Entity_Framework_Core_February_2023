@@ -23,6 +23,6 @@ namespace Invoices.DataProcessor.ImportDto
         [Range(0, 4)]
         public virtual CategoryType CategoryType { get; set; }
 
-        public int[] GetInts { get; set; } = null!;
+        public int[] Clients { get; set; } = null!;  
     }
 }
