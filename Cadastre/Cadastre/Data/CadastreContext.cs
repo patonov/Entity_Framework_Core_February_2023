@@ -27,7 +27,9 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+            modelBuilder.Entity<PropertyCitizen>(
+                entity => entity.HasKey(e => new { e.PropertyId, e.CitizenId })
+                );
         }
     }
 }
