@@ -14,21 +14,14 @@ namespace Cadastre.Data.Models
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(20)]
-        [MinLength(16)]
         public string PropertyIdentifier { get; set; } = null!;
 
         [Required]
-        [Range(0, int.MaxValue)]
         public int Area { get; set; }
 
-        [MaxLength(500)]
-        [MinLength(5)]
-        public string Details { get; set; }
+        public string? Details { get; set; }
 
         [Required]
-        [MaxLength(200)]
-        [MinLength(5)]
         public string Address { get; set; } = null!;
 
         [Required]

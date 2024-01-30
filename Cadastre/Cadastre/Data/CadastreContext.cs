@@ -17,6 +17,15 @@
             
         }
 
+        public DbSet<District> Districts { get; set; } = null!;
+
+        public DbSet<Property> Properties { get; set; } = null!;
+
+        public DbSet<Citizen> Citizens { get; set; } = null!;
+
+        public DbSet<PropertyCitizen> PropertiesCitizens { get; set; } = null!; 
+
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if(!optionsBuilder.IsConfigured)
@@ -27,9 +36,9 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<PropertyCitizen>(
-                entity => entity.HasKey(e => new { e.PropertyId, e.CitizenId })
-                );
+            modelBuilder.Entity<PropertyCitizen>(entity => {
+                entity.HasKey(e => new { e.PropertyId, e.CitizenId });
+                });
         }
     }
 }

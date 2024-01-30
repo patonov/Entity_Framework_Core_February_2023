@@ -17,17 +17,13 @@ namespace Cadastre.Data.Models
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(80)]
-        [MinLength(MagicalSpells.MinNameLength)]
         public string Name { get; set; } = null!;
 
         [Required]
-        [RegularExpression("/[A-Z]{2}\\-[0-9]{5}/gm")]
         public string PostalCode { get; set; } = null!;
 
         [Required]
-        [Range(0, 3)]
-        public Region Region { get; set; }
+        public virtual Region Region { get; set; }
 
         public virtual ICollection<Property> Properties { get; set; } = new List<Property>();
     }
