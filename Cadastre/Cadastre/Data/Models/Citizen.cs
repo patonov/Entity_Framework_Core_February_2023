@@ -24,7 +24,7 @@ namespace Cadastre.Data.Models
         public string LastName { get; set; } = null!;
 
         [Required]
-        public DataType BirthDate { get; set; }
+        public DateTime BirthDate { get; set; }
 
         [Required]
         public virtual MaritalStatus MaritalStatus { get; set; }
