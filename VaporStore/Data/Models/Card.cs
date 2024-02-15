@@ -16,22 +16,18 @@ namespace VaporStore.Data.Models
         public int Id { get; set; }
 
         [Required]
-        [RegularExpression(@"\d{4}[ ]\d{4}[ ]\d{4}[ ]\d{4}")]
         public string Number { get; set; } = null!;
 
         [Required]
-        [RegularExpression(@"\d{3}")]
         public string Cvc { get; set; } = null!;
 
-        [Range(0, 1)]
         public virtual CardType Type { get; set; }
 
-        [Required]
         [ForeignKey(nameof(User))]
         public int UserId { get; set; }
-        public virtual User User { get; set; } = null!;
+        public virtual User User { get; set; }
 
-       public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
+        public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
        
 
     }
