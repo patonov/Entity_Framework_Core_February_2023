@@ -1,7 +1,13 @@
 ﻿namespace Medicines.DataProcessor
 {
     using Medicines.Data;
+    using Newtonsoft.Json;
     using System.ComponentModel.DataAnnotations;
+    using System.Text.Json;
+    using System.Text;
+    using Medicines.DataProcessor.ImportDtos;
+    using Medicines.Data.Models;
+    using Medicines.Data.Models.Enums;
 
     public class Deserializer
     {
@@ -11,12 +17,54 @@
 
         public static string ImportPatients(MedicinesContext context, string jsonString)
         {
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder();
+
+            ImportPatientsDto[] patientDtos = JsonConvert.DeserializeObject<ImportPatientsDto[]>(jsonString);
+            ICollection<Patient> validPatients = new HashSet<Patient>();
+            
+            foreach (ImportPatientsDto patientDto in patientDtos)
+            {
+                if (!IsValid(patientDto))
+                {
+                    sb.AppendLine(ErrorMessage);
+                    continue;
+                }
+
+                Patient p = new Patient()
+                {
+                    FullName = patientDto.FullName,
+                    AgeGroup = (AgeGroup)patientDto.AgeGroup,
+                    Gender = (Gender)patientDto.Gender,
+                };
+
+                foreach (int medicine in patientDto.Medicines)
+                {
+                    if (p.PatientsMedicines.Any(x => x.MedicineId == medicine))
+                    {
+                        sb.AppendLine(ErrorMessage);
+                        continue;
+                    }
+
+                    PatientMedicine patientMedicine = new PatientMedicine()
+                    {
+                        Patient = p,
+                        MedicineId = medicine
+                    };
+
+                    p.PatientsMedicines.Add(patientMedicine);
+                }
+                validPatients.Add(p);
+                sb.AppendLine(string.Format(SuccessfullyImportedPatient, p.FullName, p.PatientsMedicines.Count));
+            }
+            context.Patients.AddRange(validPatients);
+            context.SaveChanges();
+
+            return sb.ToString().TrimEnd();
         }
 
         public static string ImportPharmacies(MedicinesContext context, string xmlString)
         {
-            throw new NotImplementedException();
+            return "tralala";
         }
 
         private static bool IsValid(object dto)
