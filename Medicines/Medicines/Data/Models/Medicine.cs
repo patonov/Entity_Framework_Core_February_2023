@@ -15,8 +15,6 @@ namespace Medicines.Data.Models
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(150)]
-        [MinLength(3)]
         public string Name { get; set; } = null!;
 
         [Required]
@@ -33,16 +31,13 @@ namespace Medicines.Data.Models
         public DateTime ExpiryDate { get; set; }
 
         [Required]
-        [MaxLength(100)]
-        [MinLength(3)]
         public string Producer { get; set; } = null!;
 
         [Required]
-        [ForeignKey(nameof(Pharmacy))]
+        [ForeignKey(nameof(PharmacyId))]
         public int PharmacyId { get; set; }
         public virtual Pharmacy Pharmacy { get; set; } = null!;
 
-        [Required]
-        public ICollection<PatientMedicine> PatientsMedicines { get; set; } = null!;
+        public virtual ICollection<PatientMedicine> PatientsMedicines { get; set; } = new List<PatientMedicine>();
     }
 }

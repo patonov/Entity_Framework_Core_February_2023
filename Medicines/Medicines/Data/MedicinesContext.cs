@@ -13,13 +13,13 @@
         {
         }
 
-        public DbSet<Patient> Patients { get; set; }
+        public DbSet<Patient> Patients { get; set; } = null!;
 
-        public DbSet<Pharmacy> Pharmacies { get; set; }
+        public DbSet<Pharmacy> Pharmacies { get; set; } = null!;
         
-        public DbSet<Medicine> Medicines { get; set; }
+        public DbSet<Medicine> Medicines { get; set; } = null!;
         
-        public DbSet<PatientMedicine> PatientsMedicines { get; set; }
+        public DbSet<PatientMedicine> PatientsMedicines { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -34,7 +34,7 @@
         {
             modelBuilder.Entity<PatientMedicine>(entity => 
             {
-                entity.HasKey(e => new { e.MedicineId, e.PatientId });
+                entity.HasKey(pm => new { pm.MedicineId, pm.PatientId });
             });
         }
     }

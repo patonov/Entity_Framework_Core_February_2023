@@ -10,14 +10,14 @@ namespace Medicines.Data.Models
 {
     public class PatientMedicine
     {
-        [Required]
-        [ForeignKey(nameof(Patient))]
         public int PatientId { get; set; }
-        public Patient Patient { get; set; } = null!;
 
-        [Required]
-        [ForeignKey(nameof(Medicine))]
+        [ForeignKey(nameof(PatientId))]
+        public virtual Patient Patient { get; set; } = null!;
+
         public int MedicineId { get; set; }
-        public Medicine Medicine { get; set; } = null!;
+
+        [ForeignKey(nameof(MedicineId))]
+        public virtual Medicine Medicine { get; set; } = null!;
     }
 }

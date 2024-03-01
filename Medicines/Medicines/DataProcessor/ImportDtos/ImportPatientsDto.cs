@@ -26,7 +26,6 @@ namespace Medicines.DataProcessor.ImportDtos
         [JsonProperty("Gender")]
         public int Gender { get; set; }
 
-        [Required]
         [JsonProperty("Medicines")]
         public int[] Medicines { get; set; }
     }

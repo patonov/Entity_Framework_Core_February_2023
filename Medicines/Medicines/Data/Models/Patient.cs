@@ -24,7 +24,6 @@ namespace Medicines.Data.Models
         [Required]
         public virtual Gender Gender { get; set; }
 
-        [Required]
-        public ICollection<PatientMedicine> PatientsMedicines { get; set; } = null!;
+        public virtual ICollection<PatientMedicine> PatientsMedicines { get; set; } = new List<PatientMedicine>();
     }
 }
