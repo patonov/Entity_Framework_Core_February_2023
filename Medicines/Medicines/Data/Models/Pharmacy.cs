@@ -9,6 +9,11 @@ namespace Medicines.Data.Models
 {
     public class Pharmacy
     {
+        public Pharmacy()
+        {
+            this.Medicines = new List<Medicine>();
+        }
+
         [Key]
         public int Id { get; set; }
 
@@ -18,11 +23,9 @@ namespace Medicines.Data.Models
         [Required]
         public string PhoneNumber { get; set; } = null!;
 
-        [Required]
         public bool IsNonStop { get; set; }
 
-        [Required]
-        public virtual ICollection<Medicine> Medicines { get; set; } = new List<Medicine>();
+        public virtual ICollection<Medicine> Medicines { get; set; }
 
     }
 }

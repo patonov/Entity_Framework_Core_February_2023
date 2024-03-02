@@ -11,33 +11,34 @@ namespace Medicines.Data.Models
 {
     public class Medicine
     {
+        public Medicine()
+        {
+            this.PatientsMedicines = new List<PatientMedicine>();
+        }
+
         [Key]
         public int Id { get; set; }
 
         [Required]
         public string Name { get; set; } = null!;
 
-        [Required]
-        [Range(0.01, 1000.00)]
         public decimal Price { get; set; }
 
-        [Required]
-        public virtual Category Category { get; set; }
+        public Category Category { get; set; }
 
-        [Required]
         public DateTime ProductionDate { get; set; }
 
-        [Required]
         public DateTime ExpiryDate { get; set; }
 
         [Required]
+        [MaxLength(100)]
         public string Producer { get; set; } = null!;
 
-        [Required]
-        [ForeignKey(nameof(PharmacyId))]
         public int PharmacyId { get; set; }
+
+        [ForeignKey(nameof(PharmacyId))]
         public virtual Pharmacy Pharmacy { get; set; } = null!;
 
-        public virtual ICollection<PatientMedicine> PatientsMedicines { get; set; } = new List<PatientMedicine>();
+        public virtual ICollection<PatientMedicine> PatientsMedicines { get; set; }
     }
 }

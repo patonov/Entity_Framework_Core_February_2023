@@ -13,20 +13,19 @@ namespace Medicines.DataProcessor.ImportDtos
     public class ImportPharmacyDto
     {
         [Required]
+        [XmlElement("Name")]
         [MaxLength(50)]
         [MinLength(2)]
-        [XmlElement("Name")]
         public string Name { get; set; } = null!;
 
         [Required]
-        [StringLength(14)]
-        [RegularExpression("\\([1][2][3]\\)\\ [0-9]{3}\\-[0-9]{4}")]
         [XmlElement("PhoneNumber")]
+        [RegularExpression("^\\(\\d{3}\\) \\d{3}-\\d{4}$")]
         public string PhoneNumber { get; set; } = null!;
 
-        [Required]        
+        [Required]
         [XmlAttribute("non-stop")]
-        [RegularExpression(@"^(true|false)$")]
+        [RegularExpression("^(true|false)$")]
         public string IsNonStop { get; set; } = null!;
 
         [XmlArray("Medicines")]

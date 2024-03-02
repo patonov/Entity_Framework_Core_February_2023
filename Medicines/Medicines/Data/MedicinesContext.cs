@@ -13,13 +13,13 @@
         {
         }
 
-        public DbSet<Patient> Patients { get; set; } = null!;
+        public DbSet<Patient> Patients { get; set; } 
 
-        public DbSet<Pharmacy> Pharmacies { get; set; } = null!;
+        public DbSet<Pharmacy> Pharmacies { get; set; } 
         
-        public DbSet<Medicine> Medicines { get; set; } = null!;
+        public DbSet<Medicine> Medicines { get; set; } 
         
-        public DbSet<PatientMedicine> PatientsMedicines { get; set; } = null!;
+        public DbSet<PatientMedicine> PatientsMedicines { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

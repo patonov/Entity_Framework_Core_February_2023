@@ -12,21 +12,24 @@ namespace Medicines.DataProcessor.ImportDtos
 {
     public class ImportPatientsDto
     {
-        [Required]
-        [MaxLength(150)]
-        [MinLength(5)]
         [JsonProperty("FullName")]
+        [MinLength(5)]
+        [MaxLength(100)]
+        [Required]
         public string FullName { get; set; } = null!;
 
-        [Required]
         [JsonProperty("AgeGroup")]
+        [Required]
+        [Range(0, 2)]
         public int AgeGroup { get; set; }
 
-        [Required]
         [JsonProperty("Gender")]
+        [Required]
+        [Range(0, 1)]
         public int Gender { get; set; }
 
         [JsonProperty("Medicines")]
+        [Required]
         public int[] Medicines { get; set; }
     }
 }

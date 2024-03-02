@@ -10,20 +10,24 @@ namespace Medicines.Data.Models
 {
     public class Patient
     {
+        public Patient()
+        {
+            this.PatientsMedicines = new List<PatientMedicine>();
+        }
+
         [Key]
         public int Id { get; set; }
 
         [Required]
         [MaxLength(150)]
-        [MinLength(5)]
         public string FullName { get; set; } = null!;
 
         [Required]
-        public virtual AgeGroup AgeGroup { get; set; }
+        public AgeGroup AgeGroup { get; set; }
 
         [Required]
-        public virtual Gender Gender { get; set; }
+        public Gender Gender { get; set; }
 
-        public virtual ICollection<PatientMedicine> PatientsMedicines { get; set; } = new List<PatientMedicine>();
+        public virtual ICollection<PatientMedicine> PatientsMedicines { get; set; } 
     }
 }

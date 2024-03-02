@@ -23,9 +23,10 @@
         {
             StringBuilder sb = new StringBuilder();
 
-            ImportPatientsDto[] patientDtos = JsonConvert.DeserializeObject<ImportPatientsDto[]>(jsonString);
-            ICollection<Patient> validPatients = new HashSet<Patient>();
+            var patientDtos = JsonConvert.DeserializeObject<ImportPatientsDto[]>(jsonString);
             
+            ICollection<Patient> validPatients = new List<Patient>();
+
             foreach (ImportPatientsDto patientDto in patientDtos)
             {
                 if (!IsValid(patientDto))
@@ -41,9 +42,9 @@
                     Gender = (Gender)patientDto.Gender,
                 };
 
-                foreach (int medicine in patientDto.Medicines)
+                foreach (int medicineId in patientDto.Medicines)
                 {
-                    if (p.PatientsMedicines.Any(x => x.MedicineId == medicine))
+                    if (p.PatientsMedicines.Any(x => x.MedicineId == medicineId))
                     {
                         sb.AppendLine(ErrorMessage);
                         continue;
@@ -52,7 +53,7 @@
                     PatientMedicine patientMedicine = new PatientMedicine()
                     {
                         Patient = p,
-                        MedicineId = medicine
+                        MedicineId = medicineId
                     };
 
                     p.PatientsMedicines.Add(patientMedicine);
@@ -99,7 +100,7 @@
                         continue;
                     }
 
-                    if (medicineDto.Price < 0.01M || medicineDto.Price > 1000.00M)
+                    if (medicineDto.Price < 0.01 || medicineDto.Price > 1000.00)
                     {
                         sb.AppendLine(ErrorMessage);
                         continue;
@@ -121,7 +122,7 @@
                         continue;
                     }
 
-                    DateTime expDate; 
+                    DateTime expDate;
                     bool IsExpDateValid = DateTime.TryParseExact(medicineDto.ExpiryDate, "yyyy-MM-dd", CultureInfo
                         .InvariantCulture, DateTimeStyles.None, out expDate);
 
@@ -131,7 +132,7 @@
                         continue;
                     }
 
-                    if (expDate <= productionDate) 
+                    if (expDate <= productionDate)
                     {
                         sb.AppendLine(ErrorMessage);
                         continue;
@@ -146,20 +147,20 @@
                     Medicine medi = new Medicine()
                     {
                         Name = medicineDto.Name,
-                        Price = medicineDto.Price,
-                        Category = (Category)Enum.Parse(typeof(Category), medicineDto.Category),
+                        Price = (decimal)medicineDto.Price,
+                        Category = (Category)medicineDto.Category,
                         ProductionDate = productionDate,
                         ExpiryDate = expDate,
                         Producer = medicineDto.Producer
                     };
                     ph.Medicines.Add(medi);
                 }
-            
+
                 pharmacies.Add(ph);
-            
+
                 sb.AppendLine(string.Format(SuccessfullyImportedPharmacy, ph.Name, ph.Medicines.Count));
             }
-            
+
             context.Pharmacies.AddRange(pharmacies);
             context.SaveChanges();
 

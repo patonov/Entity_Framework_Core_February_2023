@@ -11,40 +11,37 @@ using System.Xml.Serialization;
 
 namespace Medicines.DataProcessor.ImportDtos
 {
-    [XmlType("Medicine")]
+    [XmlType(nameof(Medicine))]
     public class ImportMedicineDto
     {
-        [Required]
-        [MaxLength(150)]
-        [MinLength(3)]
+        [XmlAttribute("category")]
+        [Range(0, 4)]
+        public int Category { get; set; }
+
         [XmlElement("Name")]
+        [Required]
+        [MinLength(3)]
+        [MaxLength(150)]
         public string Name { get; set; } = null!;
 
-        [Required]
-        [Range(0.01, 1000.00)]
         [XmlElement("Price")]
-        public decimal Price { get; set; }
+        [Range(0.01, 1000.00)]
+        public double Price { get; set; }
 
-        [Required]
-        [XmlAttribute("category")]
-        public string Category { get; set; } = null!;
-
-        [Required]
         [XmlElement("ProductionDate")]
+        [Required]
         public string ProductionDate { get; set; } = null!;
 
-        [Required]
         [XmlElement("ExpiryDate")]
+        [Required]
         public string ExpiryDate { get; set; } = null!;
 
-        [Required]
-        [MaxLength(100)]
-        [MinLength(3)]
         [XmlElement("Producer")]
+        [Required]
+        [MinLength(3)]
+        [MaxLength(100)]
         public string Producer { get; set; } = null!;
-
-        
-
-
     }
+
 }
+
