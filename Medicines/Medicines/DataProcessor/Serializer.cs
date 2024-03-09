@@ -27,21 +27,22 @@
             DateTime dateTime = DateTime.ParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
             var patients = context.Patients.ToArray()
-                .Where(p => p.PatientsMedicines.Any(p => p.Medicine.ProductionDate >= dateTime))
+                .Where(p => p.PatientsMedicines.Any(pm => pm.Medicine.ProductionDate >= dateTime))
                 .Select(p => new ExportPatientDto() 
                 { 
                 Name = p.FullName,
-                Gender = p.Gender.ToString(),
+                Gender = p.Gender.ToString().ToLower(),
                 AgeGroup = p.AgeGroup.ToString(),
-                Medicines = context.Medicines.ToArray()
-                .Where(m => m.ProductionDate >= dateTime).OrderByDescending(m => m.ExpiryDate).ThenBy(m => m.Price)
+                Medicines = p.PatientsMedicines
+                .Where(pm => pm.Medicine.ProductionDate >= dateTime).Select(pm => pm.Medicine)
+                .OrderByDescending(m => m.ExpiryDate).ThenBy(m => m.Price)
                 .Select(m => new ExportMedicinesDto() 
                     { 
                     Name = m.Name,
                     Price = m.Price.ToString("F2"),
                     Producer = m.Producer,
                     BestBefore = m.ExpiryDate.ToString("yyyy-MM-dd"),
-                    Category = m.Category.ToString()
+                    Category = m.Category.ToString().ToLower()
                     }).ToArray()
                 }).OrderByDescending(p => p.Medicines.Length)
                 .ThenBy(p => p.Name)
