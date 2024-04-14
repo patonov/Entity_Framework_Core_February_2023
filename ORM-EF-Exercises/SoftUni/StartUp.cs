@@ -1,5 +1,7 @@
 ﻿using SoftUni.Data;
+using SoftUni.Models;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 namespace SoftUni
@@ -12,7 +14,9 @@ namespace SoftUni
 
             //Console.WriteLine(GetEmployeesFullInformation(dbContext));
             //Console.WriteLine(GetEmployeesWithSalaryOver50000(dbContext));
-            Console.WriteLine(GetEmployeesFromResearchAndDevelopment(dbContext));
+            //Console.WriteLine(GetEmployeesFromResearchAndDevelopment(dbContext));
+            //Console.WriteLine(AddNewAddressToEmployee(dbContext));
+            Console.WriteLine(GetEmployeesInPeriod(dbContext));
         }
 
         //Problem 01
@@ -88,6 +92,28 @@ namespace SoftUni
         public static string AddNewAddressToEmployee(SoftUniContext context)
         {
             StringBuilder sb = new StringBuilder();
+
+            Address address = new Address()
+            {
+                AddressText = "Vitoshka 15",
+                TownId = 4
+            };
+
+            var employee = context.Employees.FirstOrDefault(e => e.LastName == "Nakov");
+
+            if (employee != null) 
+            { 
+                employee.Address = address;
+            }
+
+            var emps = context.Employees
+                .Select(e => new { e.FirstName, e.AddressId, e.Address }).OrderByDescending(e => e.AddressId).Take(10).ToArray();
+
+            foreach (var emp in emps)
+            { 
+            sb.AppendLine(emp.Address.AddressText);
+            }
+
             return sb.ToString().Trim();
         }
 
@@ -95,6 +121,34 @@ namespace SoftUni
         public static string GetEmployeesInPeriod(SoftUniContext context)
         {
             StringBuilder sb = new StringBuilder();
+
+            var employees = context.Employees.Where(e => e.EmployeesProjects.Any(ep => ep.Project.StartDate.Year >= 2001
+                                                              && ep.Project.StartDate.Year <= 2003)).Take(10)
+            .Select(e => new
+            {
+                e.FirstName,
+                e.LastName,
+                ManagerFirstName = e.Manager.FirstName,
+                ManagerLastName = e.Manager.LastName,
+                Projects = e.EmployeesProjects.Select(ep => new 
+                {
+                    ProjectName = ep.Project.Name,
+                    StartDate = ep.Project.StartDate.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture),
+                    EndDate = ep.Project.EndDate.HasValue ? 
+                            ep.Project.EndDate.Value.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture) : "not finished"
+                }).ToArray()
+            }).ToArray();
+
+            foreach (var e in employees)
+            {
+                sb.AppendLine($"{e.FirstName} {e.LastName} - Manager: {e.ManagerFirstName} {e.ManagerLastName}");
+
+                foreach (var p in e.Projects)
+                {
+                    sb.AppendLine($"--{p.ProjectName} - {p.StartDate} - {p.EndDate}");
+                }
+            }
+
             return sb.ToString().Trim();
         }
 
