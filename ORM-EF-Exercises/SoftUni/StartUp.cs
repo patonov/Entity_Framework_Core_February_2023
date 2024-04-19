@@ -16,7 +16,9 @@ namespace SoftUni
             //Console.WriteLine(GetEmployeesWithSalaryOver50000(dbContext));
             //Console.WriteLine(GetEmployeesFromResearchAndDevelopment(dbContext));
             //Console.WriteLine(AddNewAddressToEmployee(dbContext));
-            Console.WriteLine(GetEmployeesInPeriod(dbContext));
+            //Console.WriteLine(GetEmployeesInPeriod(dbContext));
+            //Console.WriteLine(GetAddressesByTown(dbContext));
+            Console.WriteLine(GetEmployee147(dbContext));
         }
 
         //Problem 01
@@ -156,6 +158,24 @@ namespace SoftUni
         public static string GetAddressesByTown(SoftUniContext context)
         {
             StringBuilder sb = new StringBuilder();
+
+            var addresses = context.Addresses.Where(a => a.Employees.Count > 0)
+                .Select(a => new 
+                { 
+                    AddressText = a.AddressText,
+                    TownName = a.Town.Name,
+                    NumberOfEmployees = a.Employees.Count
+                }).OrderByDescending(a => a.NumberOfEmployees)
+                .ThenBy(a => a.TownName)
+                .ThenBy(a => a.AddressText)
+                .Take(10)
+                .ToList();
+
+            foreach (var a in addresses) 
+            {
+                sb.AppendLine($"{a.AddressText}, {a.TownName} - {a.NumberOfEmployees} employees");
+            }
+
             return sb.ToString().Trim();
         }
 
@@ -163,6 +183,26 @@ namespace SoftUni
         public static string GetEmployee147(SoftUniContext context)
         {
             StringBuilder sb = new StringBuilder();
+
+            var employee = context.Employees.Where(e => e.EmployeeId == 147)
+                .Select(e => new
+                {
+                    e.FirstName,
+                    e.LastName,
+                    e.JobTitle,
+                    Projects = e.EmployeesProjects.Select(p => new
+                    {
+                        p.Project.Name
+                    }).OrderBy(p => p.Name).ToArray()
+                }).Single();
+
+            sb.AppendLine($"{employee.FirstName} {employee.LastName} - {employee.JobTitle}");
+
+            foreach (var p in employee.Projects) 
+            { 
+                sb.AppendLine($"{p.Name}");
+            }
+
             return sb.ToString().Trim();
         }
 
