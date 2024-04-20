@@ -18,7 +18,9 @@ namespace SoftUni
             //Console.WriteLine(AddNewAddressToEmployee(dbContext));
             //Console.WriteLine(GetEmployeesInPeriod(dbContext));
             //Console.WriteLine(GetAddressesByTown(dbContext));
-            Console.WriteLine(GetEmployee147(dbContext));
+            //Console.WriteLine(GetEmployee147(dbContext));
+            //Console.WriteLine(GetDepartmentsWithMoreThan5Employees(dbContext));
+            Console.WriteLine(GetLatestProjects(dbContext));
         }
 
         //Problem 01
@@ -210,6 +212,29 @@ namespace SoftUni
         public static string GetDepartmentsWithMoreThan5Employees(SoftUniContext context)
         {
             StringBuilder sb = new StringBuilder();
+
+            var departments = context.Departments.Where(d => d.Employees.Count > 5).OrderBy(d => d.Employees.Count).OrderBy(d => d.Name)
+                .Select(d => new 
+                { 
+                d.Name,
+                ManagerFirstName = d.Manager.FirstName,
+                ManagerLastName = d.Manager.LastName,
+                EmployeesIn = d.Employees.Select(e => new 
+                    { 
+                    e.FirstName, e.LastName, e.JobTitle
+                    }).OrderBy(e => e.FirstName).ThenBy(e => e.LastName).ToArray()
+                }).ToArray();
+
+            foreach (var department in departments)
+            {
+                sb.AppendLine($"{department.Name} - {department.ManagerFirstName} {department.ManagerLastName}");
+
+                foreach (var employee in department.EmployeesIn)
+                {
+                    sb.AppendLine($"{employee.FirstName} {employee.LastName} - {employee.JobTitle}");
+                }
+            }
+            
             return sb.ToString().Trim();
         }
 
@@ -217,6 +242,22 @@ namespace SoftUni
         public static string GetLatestProjects(SoftUniContext context)
         {
             StringBuilder sb = new StringBuilder();
+
+            var projects = context.Projects.OrderByDescending(p => p.StartDate)
+            .Select(p => new 
+            { 
+            p.Name,
+            p.Description,
+            Start = p.StartDate.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture),
+            }).OrderBy(p => p.Name).Take(10).ToArray();
+
+            foreach (var project in projects) 
+            { 
+                sb.AppendLine($"{project.Name}");
+                sb.AppendLine($"{project.Description}");
+                sb.AppendLine($"{project.Start}");
+            }
+
             return sb.ToString().Trim();
         }
 
