@@ -44,23 +44,38 @@ namespace TravelAgency.DataProcessor
 
         public static string ExportCustomersThatHaveBookedHorseRidingTourPackage(TravelAgencyContext context)
         {
-            var customers = context.Customers.ToArray()
+            var customers = context.Customers
                 .Where(c => c.Bookings.Any(b => b.TourPackage.PackageName == "Horse Riding Tour"))
                 .OrderBy(c => c.FullName)
                 .ThenBy(c => c.Bookings.Count())
-                .Select(c => new
+                .Select(c => new 
                 {
                     c.FullName,
                     c.PhoneNumber,
-                    Bookings = c.Bookings.Where(b => b.TourPackage.PackageName == "Horse Riding Tour")
+                    Bookings = c.Bookings.ToArray().Where(b => b.TourPackage.PackageName == "Horse Riding Tour")
                         .Select(b => new
                         {
                             TourPackageName = b.TourPackage.PackageName,
-                            Date = b.BookingDate.ToString("yyyy-MM-dd")
+                            Date = b.BookingDate
                         }).OrderBy(b => b.Date)
-                });
+                }).ToArray();
 
-            return JsonConvert.SerializeObject(customers, Formatting.Indented);
+            var customersDtos = customers
+                .Select(c => new ExportCustomerDto
+                {
+                    FullName = c.FullName,
+                    PhoneNumber = c.PhoneNumber,
+                    Bookings = c.Bookings
+                        .Select(b => new ExportBookingDto
+                        {
+                            TourPackageName = b.TourPackageName,
+                            Date = b.Date.ToString("yyyy-MM-dd")
+                        })
+                        .ToArray()
+                })
+                .ToArray();
+
+            return JsonConvert.SerializeObject(customersDtos, Formatting.Indented);
         }
     }
 }
