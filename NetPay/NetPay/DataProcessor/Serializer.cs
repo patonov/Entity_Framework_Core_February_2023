@@ -2,6 +2,7 @@
 using NetPay.Data;
 using NetPay.Data.Models;
 using NetPay.DataProcessor.ExportDtos;
+using Newtonsoft.Json;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Xml.Serialization;
@@ -47,7 +48,22 @@ namespace NetPay.DataProcessor
 
         public static string ExportAllServicesWithSuppliers(NetPayContext context)
         {
-            return "tralala";
+            var services = context.Services
+                .Select(s => new
+                {
+                    s.ServiceName,
+                    Suppliers = s.SuppliersServices
+                    .Select(ss => new
+                    {
+                        ss.Supplier.SupplierName
+                    })
+                    .OrderBy(s => s.SupplierName)
+                    .ToArray()
+                })
+                .OrderBy(s => s.ServiceName)
+                .ToArray();
+
+            return JsonConvert.SerializeObject(services, Formatting.Indented);
         }
     }
 }

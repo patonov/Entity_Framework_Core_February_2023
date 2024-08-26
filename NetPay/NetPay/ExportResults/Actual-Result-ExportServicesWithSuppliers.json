@@ -1,1 +1,160 @@
-hahahah
+[
+  {
+    "ServiceName": "Electricity",
+    "Suppliers": [
+      {
+        "SupplierName": "E-Service"
+      },
+      {
+        "SupplierName": "Light"
+      },
+      {
+        "SupplierName": "Energy-PRO"
+      },
+      {
+        "SupplierName": "ZEC"
+      }
+    ]
+  },
+  {
+    "ServiceName": "Gas",
+    "Suppliers": [
+      {
+        "SupplierName": "GasGas"
+      },
+      {
+        "SupplierName": "BlueHome"
+      }
+    ]
+  },
+  {
+    "ServiceName": "Internet",
+    "Suppliers": [
+      {
+        "SupplierName": "Cellular"
+      },
+      {
+        "SupplierName": "A2one"
+      },
+      {
+        "SupplierName": "Telecom"
+      },
+      {
+        "SupplierName": "Cell2U"
+      },
+      {
+        "SupplierName": "DigiTV"
+      },
+      {
+        "SupplierName": "NetCom"
+      },
+      {
+        "SupplierName": "Net1"
+      },
+      {
+        "SupplierName": "MaxTel"
+      },
+      {
+        "SupplierName": "FiberScreen"
+      },
+      {
+        "SupplierName": "SpeedNet"
+      }
+    ]
+  },
+  {
+    "ServiceName": "Phone",
+    "Suppliers": [
+      {
+        "SupplierName": "Cellular"
+      },
+      {
+        "SupplierName": "A2one"
+      },
+      {
+        "SupplierName": "Telecom"
+      },
+      {
+        "SupplierName": "Cell2U"
+      },
+      {
+        "SupplierName": "MaxTel"
+      }
+    ]
+  },
+  {
+    "ServiceName": "Security",
+    "Suppliers": [
+      {
+        "SupplierName": "A2one"
+      },
+      {
+        "SupplierName": "NetCom"
+      },
+      {
+        "SupplierName": "MaxTel"
+      },
+      {
+        "SupplierName": "SpeedNet"
+      },
+      {
+        "SupplierName": "SecureHouse"
+      },
+      {
+        "SupplierName": "HomeGuard"
+      },
+      {
+        "SupplierName": "SafeHome"
+      }
+    ]
+  },
+  {
+    "ServiceName": "TV",
+    "Suppliers": [
+      {
+        "SupplierName": "Cellular"
+      },
+      {
+        "SupplierName": "A2one"
+      },
+      {
+        "SupplierName": "Telecom"
+      },
+      {
+        "SupplierName": "Cell2U"
+      },
+      {
+        "SupplierName": "DigiTV"
+      },
+      {
+        "SupplierName": "NetCom"
+      },
+      {
+        "SupplierName": "Net1"
+      },
+      {
+        "SupplierName": "MaxTel"
+      },
+      {
+        "SupplierName": "FiberScreen"
+      },
+      {
+        "SupplierName": "SpeedNet"
+      }
+    ]
+  },
+  {
+    "ServiceName": "Water",
+    "Suppliers": [
+      {
+        "SupplierName": "WaterSupplyCentral"
+      },
+      {
+        "SupplierName": "WaterSupplyNorth"
+      },
+      {
+        "SupplierName": "WaterSupplySouth"
+      }
+    ]
+  }
+]
