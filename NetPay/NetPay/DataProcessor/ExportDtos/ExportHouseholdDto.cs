@@ -21,7 +21,8 @@ namespace NetPay.DataProcessor.ExportDtos
         public string PhoneNumber { get; set; } = null!;
 
         [XmlArray("Expenses")]
-        public ExportExpenseDto[] Expenses { get; set; } = null!;
+        [XmlArrayItem("Expense")]
+        public virtual List<ExportExpenseDto> Expenses { get; set; } = new List<ExportExpenseDto>();
 
     }
 }

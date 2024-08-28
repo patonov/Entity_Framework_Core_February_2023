@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NetPay.Data;
 using NetPay.Data.Models;
+using NetPay.Data.Models.Enums;
 using NetPay.DataProcessor.ExportDtos;
 using Newtonsoft.Json;
 using System.Reflection.Metadata.Ecma335;
@@ -14,25 +15,42 @@ namespace NetPay.DataProcessor
         public static string ExportHouseholdsWhichHaveExpensesToPay(NetPayContext context)
         {
            
-            ExportHouseholdDto[] exportHouseholdDtos = context.Households.ToArray()
-                .Where(h => h.Expenses.Any(e => e.PaymentStatus.ToString() == "Unpaid")).
-                OrderBy(h => h.ContactPerson)
-                .Select(h => new ExportHouseholdDto 
+            var exportHouseholds = context.Households.ToArray()
+                .Where(h => h.Expenses.Any(e => e.PaymentStatus != PaymentStatus.Paid))
+                .OrderBy(h => h.ContactPerson)
+                .Select(h => new  
                 { 
                 ContactPerson = h.ContactPerson,
                 Email = h.Email,
                 PhoneNumber = h.PhoneNumber,
-                    Expenses = h.Expenses.Where(e => e.PaymentStatus.ToString() != "Paid")
-                    .Select(e => new ExportExpenseDto 
+                    Expenses = h.Expenses.Where(e => e.PaymentStatus != PaymentStatus.Paid)
+                    .Select(e => new  
                     { 
                     ExpenseName = e.ExpenseName,
-                    Amount = e.Amount.ToString("F2"),
-                    PaymentDate = e.DueDate.ToString("yyyy-MM-dd"),
+                    Amount = e.Amount,
+                    PaymentDate = e.DueDate,
                     ServiceName = e.Service.ServiceName
-                    }).OrderBy(e => e.PaymentDate).ThenBy(e => e.Amount)
-                    .ToArray()
+                    }).OrderBy(e => e.PaymentDate)
+                }).ToArray();
+
+            var exportHouseholdDtos = exportHouseholds.Select(h => new ExportHouseholdDto
+            {
+                ContactPerson = h.ContactPerson,
+                Email = h.Email,
+                PhoneNumber = h.PhoneNumber,
+                Expenses = h.Expenses.Select(e => new ExportExpenseDto
+                {
+                    ExpenseName = e.ExpenseName,
+                    Amount = e.Amount.ToString("F2"),
+                    PaymentDate = e.PaymentDate.ToString("yyyy-MM-dd"),
+                    ServiceName = e.ServiceName
                 })
-                .ToArray();
+                .OrderBy(e => e.PaymentDate)
+                .ThenBy(e => e.Amount)
+                .ToList()
+            })
+            .OrderBy(h => h.ContactPerson)
+            .ToArray();
 
             StringBuilder sb = new StringBuilder();
 
